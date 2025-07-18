@@ -1,0 +1,116 @@
+###
+
+import os
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-&psk#na5l=p3q8_a+-$4w1f^lt3lx1c@d*p4x$ymm_rn7pwb87')
+
+
+
+
+
+
+###
+
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+
+
+
+
+
+
+###
+
+Перед security key warning
+
+from dotenv import load_dotenv
+env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(env_path)
+
+
+
+
+
+
+
+
+### 
+
+
+Після DATABASE визначення
+
+import dj_database_url
+
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=500,  - через який час треба оновити з єднання
+        conn_health_checks=True, - перевірка здоров я з єднання
+    )
+
+
+
+
+
+
+
+
+###
+
+In the production environment we typically separate the static files from the Django web application, making it easier to serve 
+them directly from the web server or from a content delivery network (CDN).
+
+
+
+
+
+
+
+
+
+
+###
+
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+
+
+
+###
+
+'whitenoise.middleware.WhiteNoiseMiddleware', - добавляємо це до midlewhare, але перед цим скачуємо whitenoise
+Необхідне для збору статичних файлів за налаштуваннями STATIC_ROOT та STATIC_URL
+
+
+
+
+
+
+
+###
+
+# Static file serving.
+# https://whitenoise.readthedocs.io/en/stable/django.html#add-compression-and-caching-support
+STORAGES = {
+    # ...
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+стиснення статичниих файлів
+
+
+
+
+
+
+
+
+###
+
+The Python requirements of your web application should be stored in a file requirements.txt in the root of your repository. 
+Many hosting services will automatically install dependencies in this file (in others you have to do this yourself). 
+You can create this file using pip on the command line (run the following in the repo root):
+
+
+pip freeze > requirements.txt

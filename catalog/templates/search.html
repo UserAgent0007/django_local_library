@@ -1,0 +1,31 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}
+    <title>Search results</title>
+{% endblock %}
+
+{% block content %}
+    <h2>Search result</h2>
+    {% if req %}
+
+        {% if books %}
+
+            <ul>
+
+                {% for book in books %}
+
+                    <li>
+                        <p>Title: {{ book.title }}</p>
+                        <p>Author: {{ book.author.first_name }} {{ book.author.last_name }}</p>
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+        
+        {% else %}
+            <p>Nothing was found</p>
+        {% endif %}
+
+    {% endif %}
+{% endblock %}

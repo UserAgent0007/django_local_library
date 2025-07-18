@@ -1,0 +1,20 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+
+<h1>Loaned Books</h1>
+<ul>
+{% for book in all_books %}
+
+    <li>
+
+        <p class="{% if book.is_overdue %}text-danger{% endif %}"><a href="{% url 'book-detail' pk=book.book.pk%}">{{book.book.title}}</a> ({{ book.due_back }})</p>
+        <p>Borrower - {{ book.borrower }} <a href="{% url 'renew-book-librarian' book.id %}">Renew</a></p>
+        
+    </li>
+
+{% endfor %}
+</ul>
+
+{% endblock %}
+

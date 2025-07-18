@@ -1,0 +1,115 @@
+### - вказування дозволів
+
+
+class BookInstance(models.Model):
+    # …
+    class Meta:
+        # …
+        permissions = (("can_mark_returned", "Set book as returned"),)
+
+
+### - Тестування чи має користувач первної групи довіл визначений в додатку (app)
+
+
+{% if perms.catalog.can_mark_returned %}
+    <!-- We can mark a BookInstance as returned. -->
+    <!-- Perhaps add code to link to a "book return" view here. -->
+{% endif %}
+
+
+### - Як запроваджувати дозоли у view
+
+
+Permissions can be tested in function view using the permission_required decorator or in a class-based view using the PermissionRequiredMixin. The pattern are the same as for login authentication, though of course, you might reasonably have to add multiple permissions.
+
+Function view decorator:
+
+python
+Copy to Clipboard
+from django.contrib.auth.decorators import permission_required
+
+@permission_required('catalog.can_mark_returned')
+@permission_required('catalog.can_edit')
+def my_view(request):
+    # …
+A permission-required mixin for class-based views.
+
+python
+Copy to Clipboard
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
+class MyView(PermissionRequiredMixin, View): 
+    permission_required = 'catalog.can_mark_returned'
+    # Or multiple permissions
+    permission_required = ('catalog.can_mark_returned', 'catalog.change_book')
+    # Note that 'catalog.change_book' is permission
+    # Is created automatically for the book model, along with add_book, and delete_book
+
+Якщо не має дозволу, то поверне помилку 403 permission denied
+
+
+@permission_required не повертає помилку 403, а робить перенаправлення на сторінку логування (повертає код 302)
+
+
+
+
+
+### Як добитися permission denied для function based view
+
+прописати raise_exception = True
+
+
+from django.contrib.auth.decorators import login_required, permission_required
+
+@login_required
+@permission_required('catalog.can_mark_returned', raise_exception=True)
+def my_view(request):
+    # …
+
+
+
+
+
+
+### - перевірка чи поточний користувач має дозвіл
+
+
+
+{% if perms.catalog.can_mark_returned %}
+    <!-- We can mark a BookInstance as returned. -->
+    <!-- Perhaps add code to link to a "book return" view here. -->
+{% endif %}
+
+
+
+
+
+
+
+
+###
+
+Як додати дозвіл для користуача
+
+from django.contrib.auth.models import Permission
+
+test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
+test_user2 = User.objects.create_user(username='testuser2', password='2HJ1vRV0Z&3iD')
+
+test_user1.save()
+test_user2.save()
+# Give test_user2 permission to renew books.
+permission = Permission.objects.get(name='Set book as returned')
+test_user2.user_permissions.add(permission)
+test_user2.save()
+
+
+
+
+
+
+
+
+
+###
+

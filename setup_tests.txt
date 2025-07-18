@@ -1,0 +1,262 @@
+### Як налаштовувати тести похідні від TestCase
+
+class YourTestClass(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        print("setUpTestData: Run once to set up non-modified data for all class methods.")
+        pass
+
+    def setUp(self):
+        print("setUp: Run once for every test method to set up clean data.")
+        pass
+
+    def test_false_is_false(self):
+        print("Method: test_false_is_false.")
+        self.assertFalse(False)
+
+    def test_false_is_true(self):
+        print("Method: test_false_is_true.")
+        self.assertTrue(False)
+
+    def test_one_plus_one_equals_two(self):
+        print("Method: test_one_plus_one_equals_two.")
+        self.assertEqual(1 + 1, 2)
+
+
+
+The new class defines two methods that you can use for pre-test configuration 
+(for example, to create any models or other objects you will need for the test):
+
+setUpTestData() is called once at the beginning of the test run for class-level setup. 
+You'd use this to create objects that aren't going to be modified or changed in any of the test methods.
+
+setUp() is called before every test function to set up any objects that may be modified by the test 
+(every test function will get a "fresh" version of these objects).
+
+@classmethod - вказує що це є методом самого класу, а не екземпляру, для виклику функції екземпляр не потрібен. В якості параметра приймає
+свій же клас, а cls.author_for_all_tests = MyModel.objects.create(name="Shared Author") буде вже атрибутом цього класу
+
+
+
+
+
+### 
+
+assertFalse, assertEqual, assertTrue - стандартні методи UnitTest
+
+
+
+
+
+
+
+
+
+###
+
+
+
+
+Можна вказувати рівні деталізації
+
+Showing more test information
+If you want to get more information about the test run you can change the verbosity.
+For example, to list the test successes as well as failures (and a whole bunch of information about how the testing database is set up)
+you can set the verbosity to "2" as shown:
+
+bash
+Copy to Clipboard
+python3 manage.py test --verbosity 2
+The allowed verbosity levels are 0, 1, 2, and 3, with the default being "1".
+
+
+
+
+
+
+
+###
+
+Можна запускати тести паралельно на 1 ядро 1 тест
+
+
+python3 manage.py test --parallel auto
+
+
+
+
+
+
+
+
+
+###
+
+Якщо ми хочемо запустити якийсь конкретний тест, то прописуємо до нього шлях через крапку
+
+# Run the specified module
+python3 manage.py test catalog.tests
+
+# Run the specified module
+python3 manage.py test catalog.tests.test_models
+
+# Run the specified class
+python3 manage.py test catalog.tests.test_models.YourTestClass
+
+# Run the specified method
+python3 manage.py test catalog.tests.test_models.YourTestClass.test_one_plus_one_equals_two
+
+
+
+
+
+
+
+
+###
+
+
+
+Інші опції для тестування
+
+--shufle - перетасовує тести
+
+--debug-mode - більше інформації про налагодження
+
+
+
+
+
+
+
+
+### Тестування форм
+
+
+The philosophy for testing your forms is the same as for testing your models; 
+you need to test anything that you've coded or your design specifies, but not the behavior of the underlying 
+framework and other third party libraries.
+
+
+
+
+
+
+###
+
+
+def test_view_url_exists_at_desired_location(self):
+        response = self.client.get('/catalog/authors/')
+        self.assertEqual(response.status_code, 200)
+
+
+response = self.client.get('/catalog/authors/')
+
+self.client: Це ключовий елемент. Кожен екземпляр django.test.TestCase автоматично надає вам тестовий клієнт (об'єкт django.test.Client). 
+Цей клієнт діє як симуляція веб-браузера або HTTP-клієнта.
+
+Він дозволяє виконувати HTTP-запити (GET, POST, PUT, DELETE тощо) до вашого Django-додатку без фактичного запуску веб-сервера.
+Запити виконуються безпосередньо у вашому тестовому середовищі Python, що робить їх дуже швидкими та ефективними.
+
+Коли ви робите запит за допомогою self.client, він повністю обходить мережевий стек. Це означає, 
+що ви не тестуєте фактичне розгортання сервера чи проблеми з мережею, а лише логіку вашого Django-додатку.
+
+
+
+
+
+
+
+
+
+###
+
+
+def test_view_uses_correct_template(self):
+        response = self.client.get(reverse('authors'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'catalog/author_list.html')
+
+Перевірка чи запускається той шаблони
+
+
+
+
+
+
+
+
+
+###
+
+
+Як отримати початкові значення форми
+
+
+response = self.client.get(reverse('renew-book-librarian', kwargs={'pk': self.test_bookinstance1.pk}))
+response.context['form'].initial['renewal_date']
+
+
+
+
+
+
+
+###
+
+
+Те як відправляти данні на сервер при тестуванні
+
+response = self.client.post(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}), {'renewal_date':valid_date_in_future})
+
+
+
+
+
+
+
+
+###
+
+Перевірка чи коректно працює форма при тестуванні представлень, при перевірці самих форм у тестуванні форм, користуємося is_valid()
+
+We use assertFormError() to verify that the error messages are as expected.
+
+
+
+
+
+
+
+
+###
+
+
+Цей метод (assertFormError) є одним із зручних інструментів, наданих django.test.TestCase, 
+спеціально розроблених для перевірки наявності та змісту помилок валідації у формах.
+
+Що він перевіряє:
+Він перевіряє, чи має форма (яка була відрендерена та повернута у response.context) помилку валідації, пов'язану з певним полем, 
+і чи текст цієї помилки відповідає очікуваному.
+
+Детальний розбір аргументів:
+response.context['form'] (перший аргумент):
+
+Це об'єкт form, який ваше представлення (view) передало до шаблону в контексті ({{ form }} у шаблоні).
+
+Цей form об'єкт повинен бути екземпляром вашої forms.Form або forms.ModelForm.
+
+Важливо: Цей тест буде використовуватися після того, як ви відправили невалідні дані на форму (зазвичай POST-запит), 
+і view повторно відобразило форму з помилками, а не перенаправило. Це означає, що response.status_code тут буде 200.
+
+'renewal_date' (другий аргумент):
+
+Це назва поля форми, для якого ви очікуєте побачити помилку.
+
+У вашому прикладі це поле називається renewal_date.
+
+'Invalid date - renewal more than 4 weeks ahead' (третій аргумент):
+
+Це очікуваний текст повідомлення про помилку, який ви хочете перевірити для вказаного поля.
+
+Повідомлення про помилку має точно відповідати тому, яке ваша форма (або валідатор) генерує.

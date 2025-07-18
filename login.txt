@@ -1,0 +1,51 @@
+## переадресація після успішного введення логіну та ппаролю
+
+LOGIN_REDIRECT_URL = '/' 
+
+
+
+
+###
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # дозвіл на тестування електронних адрес
+
+
+
+
+###
+
+Потреба залогінитись для доступу на якусь сторінку
+
+
+
+If you're using function-based views, the easiest way to restrict access to your functions is to apply the login_required decorator to your view function, as shown below. If the user is logged in then your view code will execute as normal. If the user is not logged in, this will redirect to the login URL defined in the project settings (settings.LOGIN_URL), passing the current absolute path as the next URL parameter. If the user succeeds in logging in then they will be returned back to this page, but this time authenticated.
+
+python
+Copy to Clipboard
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def my_view(request):
+    # …
+Note: You can do the same sort of thing manually by testing on request.user.is_authenticated, but the decorator is much more convenient!
+
+Similarly, the easiest way to restrict access to logged-in users in your class-based views is to derive from LoginRequiredMixin. You need to declare this mixin first in the superclass list, before the main view class.
+
+python
+Copy to Clipboard
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class MyView(LoginRequiredMixin, View):
+    # …
+This has exactly the same redirect behavior as the login_required decorator. You can also specify an alternative location to redirect the user to if they are not authenticated (login_url), and a URL parameter name instead of to insert the current absolute path ().nextredirect_field_name
+
+python
+Copy to Clipboard
+class MyView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    redirect_field_name = 'redirect_to'
+
+
+
+
+redirect_field_name - те як ми захочимо побачити параметр у шаблоні (спершу було next, а стане те, що записане у redirect_field_name)
