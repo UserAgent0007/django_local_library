@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block title %}
+  <title>Document</title>
+  {% endblock %}
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha3841BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-2">
+        {% block sidebar %}
+        <ul class="sidebar-nav">
+          <li><a href="{% url 'index' %}">Home</a></li>
+          <li><a href="{% url 'books' %}">All books</a></li>
+          <li><a href="{% url 'author-list' %}">All authors</a></li>
+        </ul>
+        <ul class="sidebar-nav">
+          {% if user.is_authenticated %}
+          <li>User: {{ user.get_username }}</li>
+
+          <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
+
+
+          <li>
+            <form id="logout-form" method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link" style="padding: 0;">Logout</button>
+            </form>
+          </li>
+          {% else %}
+          <li><a href="{% url 'login' %}?next={% if request.path != '/accounts/logout/' %}{{ request.path }}{% else %}/catalog/{% endif %}">Login</a></li>
+          {% endif %}
+
+        </ul>
+
+        
+        <div style="border-top: solid 1px; padding-top: 2rem;">
+          <p><strong>Staff</strong></p>
+          {% if perms.catalog.can_mark_returned %}
+          <p><a href="{% url 'all-borrowed' %}">All books</a></p>
+          {% endif %}
+
+          {% if perms.catalog.add_author %}
+          <p><a href="{% url 'author-create' %}">Create author</a></p>
+          {% endif %}
+
+          {% if perms.catalog.add_book %}
+    
+          <p><a href="{% url 'new-book' %}">Add new book</a></p>
+
+          {% endif %}
+          
+        </div>
+
+        
+        
+        {% endblock %}
+      </div>
+      <div class="col-sm-10 ">
+
+        {% block content %}{% endblock %}
+
+        {% block pagination %} <!-- початок блоку пагінації -->
+        {% if is_paginated %} <!-- перевірка чи вона взагалі є -->
+        <div class="pagination">
+          <span class="page-links">
+            {% if page_obj.has_previous %} <!-- Чи є попередня сторінка -->
+            <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+            <!--request.path - шлях до поточної сторінки. ? початок запиту і далі вказуємо попередню сторінку-->
+            {% endif %}
+            <span class="page-current">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+              <!--поточна сторінка із загальної кількості-->
+            </span>
+            {% if page_obj.has_next %} <!--перевірка чи є наступна -->
+            <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+            <!--аналогічне посилання на наступну сторінку-->
+            {% endif %}
+          </span>
+        </div>
+        {% endif %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

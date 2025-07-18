@@ -1,0 +1,176 @@
+### - деякі типи полів форми
+
+
+BooleanField
+CharField
+ChoiceField
+TypedChoiceField
+DateField
+DateTimeField
+DecimalField
+DurationField
+EmailField
+FileField
+FilePathField
+FloatField
+ImageField
+IntegerField
+GenericIPAddressField
+MultipleChoiceField
+TypedMultipleChoiceField
+NullBooleanField
+RegexField
+SlugField
+TimeField
+URLField
+UUIDField
+ComboField
+MultiValueField
+SplitDateTimeField
+ModelMultipleChoiceField
+ModelChoiceField
+
+
+
+
+
+
+
+
+### - Most common arguments for this fields
+
+
+The arguments that are common to most fields are listed below (these have sensible default values):
+
+required: If True, the field may not be left blank or given a None value. Fields are required by default, so you would set required=False to allow blank values in the form.
+
+label: The label to use when rendering the field in HTML. If a label is not specified, Django will create one from the field name by capitalizing the first letter and replacing underscores with spaces (e.g., Renewal date).
+
+label_suffix: By default, a colon is displayed after the label (e.g., Renewal date​:). 
+This argument allows you to specify a different suffix containing other character(s).
+
+initial: The initial value for the field when the form is displayed.
+
+widget: The display widget to use.
+
+help_text (as seen in the example above): Additional text that can be displayed in forms to explain how to use the field.
+
+error_messages: A list of error messages for the field. You can override these with your own messages if needed.
+
+validators: A list of functions that will be called on the field when it is validated.
+
+localize: Enables the localization of form data input (see link for more information).
+
+disabled: The field is displayed but its value cannot be edited if this is True. The default is False.
+
+
+
+
+
+
+
+
+
+
+
+### - Валідація
+
+Validation
+Django provides numerous places where you can validate your data. 
+The easiest way to validate a single field is to override the method clean_<field_name>() for the field you want to check. 
+
+
+
+
+
+###
+
+
+Після базової валідації (перевірка на тип, максимальну довжину, чи нічого не пропущено) поля з’являється у словнику self.cleaned_data, 
+і далі ми отримуємо за ключем дані та перевіряємо дотримання інших прописаних нами правил
+
+self.cleaned_data['назва поля'] - отримуємо значення поля
+
+
+
+Коли користуємося цією функцією обов ’язково потрібно зробити return і поле яке перевіряли (приклад у forms.py папки catalog)
+
+
+
+
+
+
+
+
+### 
+
+
+However, if you just need a form to map the fields of a single model then your model will already define most of 
+the information that you need in your form: fields, labels, help text and so on. 
+Rather than recreating the model definitions in your form, it is easier to use the ModelForm helper class to create the form 
+from your model. This ModelForm can then be used within your views in exactly the same way as an ordinary .Form
+
+A basic ModelForm containing the same field as our original RenewBookForm is shown below. 
+All you need to do to create the form is add class Meta with the associated model (BookInstance) and a list of the model fields
+to include in the form.
+
+
+
+from django.forms import ModelForm
+
+from catalog.models import BookInstance
+
+class RenewBookModelForm(ModelForm):
+    class Meta:
+        model = BookInstance
+        fields = ['due_back']
+
+
+І тут можемо вткористовувати аналогічну валідацію
+
+
+
+
+
+
+
+###
+
+Також можна і автоматизувати частково представлення  форм, використовуючи Generic editing views
+
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+
+
+
+
+
+
+
+
+
+
+### - Правила називання шаблонів
+
+
+The "create" and "update" views use the same template by default, which will be named after your model: model_name_form.html 
+(you can change the suffix to something other than _form using the template_name_suffix field in your view, for example,
+template_name_suffix = '_other_suffix')
+
+
+The "delete" view expects to find a template named with the format [model_name]_confirm_delete.html 
+(again, you can change the suffix using template_name_suffix in your view). 
+Create the template file django-locallibrary-tutorial/catalog/templates/catalog/author_confirm_delete.html and copy the text below.
+
+
+
+
+
+
+
+### 
+
+
+
+
+Якщо ми замість 'initial =' використаємо 'data =', при ініціалізації форми , то ми симулюватимемо Post запит форми із заповненими данними
+через data

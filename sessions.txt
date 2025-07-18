@@ -1,0 +1,42 @@
+Saving session data
+By default, Django only saves to the session database and sends the session cookie to the client when the session has been modified (assigned) or deleted. 
+If you're updating some data using its session key as shown in the previous section, then you don't need to worry about this! For example:
+
+python
+Copy to Clipboard
+# This is detected as an update to the session, so session data is saved.
+request.session['my_car'] = 'mini'
+If you're updating some information within session data, then Django will not recognize that you've made a change to the session and save the data 
+(for example, if you were to change wheels data inside your my_car data, as shown below). 
+
+In this case you will need to explicitly mark the session as having been modified.
+
+python
+Copy to Clipboard
+# Session object not directly modified, only data within the session. Session changes not saved!
+request.session['my_car']['wheels'] = 'alloy'
+
+# Set session as modified to force data updates/cookie to be saved.
+request.session.modified = True
+Note: You can change the behavior so the site will update the database/send cookie on every request
+by adding SESSION_SAVE_EVERY_REQUEST = True into your project settings (django-locallibrary-tutorial/locallibrary/settings.py).
+
+
+Ми це використовуємо якщо неявно відбулася зміна у sessions, наприклад
+
+# Якщо ви робите так:
+request.session['my_list'].append('new_item')
+# Django може не помітити, що 'my_list' змінився.
+# Тому потрібно:
+request.session.modified = True
+
+Пояснення: request.session['my_list'] повертає посилання на список. Метод append() змінює цей список на місці,
+але сам словник request.session не бачить, що його елемент було переприсвоєно.
+
+Якщо явно відбулася зміна (переприсвоєння елементів словника sessions), то вище описане не потрібно використовувати
+
+####
+
+
+
+В основному подібне до роботи зі словниками 

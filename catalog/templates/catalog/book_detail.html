@@ -1,0 +1,38 @@
+{% extends "base_generic.html" %} 
+
+{% block sidebar %}
+
+    {{ block.super }}
+
+    <div style="border-top: solid 1px; padding-top: 2rem;">
+
+        <p><a href="{% url 'update-book' book_details.pk %}">Update book</a></p>
+        <p><a href="{% url 'delete-book' book_details.pk %}">Delete book</a></p>
+
+    </div>
+{% endblock %}
+
+{% block content %} 
+    <h1>Title: {{ book_details.title }}</h1> 
+    <p><strong>Author:</strong> <a href="{{book_details.author.get_absolute_url}}">{{ book_details.author }}</a></p> 
+    <!-- author detail link not yet defined --> 
+    <p><strong>Summary:</strong> {{ book_details.summary }}</p> 
+    <p><strong>ISBN:</strong> {{ book_details.isbn }}</p> 
+    <p><strong>Language:</strong> {{ book_details.language }}</p> 
+    <p><strong>Genre:</strong> {{ book_details.genre.all|join:", " }}</p> 
+    <div style="margin-left:20px;margin-top:20px"> 
+        <h4>Copies</h4> 
+    
+        {% for copy in book_details.bookinstance_set.all %} 
+        <hr /> 
+        <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}"> 
+            {{ copy.get_status_display }} 
+        </p> 
+        {% if copy.status != 'a' %} 
+            <p><strong>Due to be returned:</strong> {{ copy.due_back }}</p> 
+        {% endif %} 
+        <p><strong>Imprint:</strong> {{ copy.imprint }}</p> 
+        <p class="text-muted"><strong>Id:</strong> {{ copy.id }}</p> 
+        {% endfor %} 
+    </div> 
+{% endblock %} 

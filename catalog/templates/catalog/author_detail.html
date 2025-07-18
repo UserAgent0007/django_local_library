@@ -1,0 +1,34 @@
+{% extends 'base_generic.html' %}
+
+{% block sidebar %}
+  {{ block.super }}
+
+  {% if perms.catalog.change_author or perms.catalog.delete_author %}
+  
+  <div style="border-top: solid 1px; padding-top: 2rem;">
+    {% if perms.catalog.change_author %}
+      <p><a href="{% url 'author-update' pk=author_info.pk %}">Update author</a></p>
+    {% endif %}
+    {% if not author.book_set.all and perms.catalog.delete_author %}
+      <p><a href="{% url 'author-delete' pk=author_info.pk %}">Delete author</a></p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+{% endblock %}
+
+{% block content %}
+    <h1>{{ author_info.first_name }} {{author_info.last_name}}</h1>
+    <p class="text-muted">{{author_info.date_of_birth}} {{author_info.date_of_death}}</p>
+
+    <h2>Books</h2>
+    <ul>
+        {% for book in author_info.book_set.all %}
+            <li>
+                <a href="{{book.get_absolute_url}}">{{ book.title }} ({{ book.bookinstance_set.all.count }})</a>
+                <p>{{ book.summary }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
