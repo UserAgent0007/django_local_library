@@ -114,3 +114,40 @@ You can create this file using pip on the command line (run the following in the
 
 
 pip freeze > requirements.txt
+
+
+
+
+
+
+###
+
+A Procfile is the web application "entry point". It lists the commands that will be executed by Railway to start your site.
+
+Create the file Procfile (with no file extension) in the root of your GitHub repo and copy/paste in the following text:
+
+web: python manage.py migrate && python manage.py collectstatic --no-input && gunicorn locallibrary.wsgi
+
+
+
+
+
+
+
+###
+
+
+Runtime
+The runtime.txt file, if defined, tells Railway which version of Python to use. 
+Create the file in the root of the repo and add the following text:
+
+python-3.10.2
+
+
+
+
+
+
+
+###
+
