@@ -1,3 +1,11 @@
+Перед security key warning
+
+from dotenv import load_dotenv
+env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(env_path)
+
+
+
 ###
 
 import os
@@ -19,13 +27,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ###
 
-Перед security key warning
-
-from dotenv import load_dotenv
-env_path = load_dotenv(os.path.join(BASE_DIR, '.env'))
-load_dotenv(env_path)
-
-
+pip install gunicorn - треба виконати це в консолі
 
 
 
@@ -44,6 +46,19 @@ if 'DATABASE_URL' in os.environ:
         conn_max_age=500,  - через який час треба оновити з єднання
         conn_health_checks=True, - перевірка здоров я з єднання
     )
+
+
+
+
+
+
+
+
+###
+
+pip install psycopg2-binary - теж завантажити
+
+
 
 
 
@@ -163,9 +178,13 @@ ALLOWED_HOSTS = ['web-production-3640.up.railway.app', '127.0.0.1']
 ###
 
 
-ALLOWED_HOSTS = ['web-production-cabf3.up.railway.app', '127.0.0.1']
-
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-cabf3.up.railway.app',
+    # 'http://*.railway.app',
+    # Також, якщо розробляєте локально:
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 
 
@@ -191,7 +210,7 @@ railway link
 
 Перед створенням суперкористувача заходимо на сайт та базу даних відкриваємо, далі знаходимо url бази даних і створюємо в проекті змінну 
 оточення DJANGO_URL і вставляємо туди адресу бази даних
-
+Встановлюємо DJANGO_SECRET_KEY
 
 
 
@@ -201,3 +220,10 @@ railway link
 створюємо суперкористувача
 
 railway run python manage.py createsuperuser
+
+
+
+
+
+
+
