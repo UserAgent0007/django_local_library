@@ -38,13 +38,13 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = ['web-production-cabf3.up.railway.app' ,'127.0.0.1']
 
-# CSRF_TRUSTED_ORIGINS = [
-#     'https://*.railway.app',
-#     'http://*.railway.app',
-#     # Також, якщо розробляєте локально:
-#     'http://localhost:8000',
-#     'http://127.0.0.1:8000',
-# ]
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-cabf3.up.railway.app'
+    # 'http://*.railway.app',
+    # Також, якщо розробляєте локально:
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
 
 # trusted_origins = os.environ.get('CSRF_TRUSTED_ORIGINS')
 # if trusted_origins:
@@ -175,4 +175,4 @@ STORAGES = {
 }
 
 
-CSRF_TRUSTED_ORIGINS = ['https://web-production-3640.up.railway.app']
+
